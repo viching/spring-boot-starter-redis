@@ -12,7 +12,31 @@
 		<version>1.0-SNAPSHOT</version>
 	</dependency>
 
-2，redis-cluster，环境配置和使用请参照官方文档
+2，redis-cluster，环境配置和使用请参照官方文档,相关参数可配置如下，例如：
+	spring:
+	  redis:
+	    #host: 
+	    #port: 6379
+	    password: admin
+	    cluster: 
+	      maxRedirects: 10
+	      nodes: 
+	       - 192.168.1.103:7000
+	       - 192.168.1.103:7001
+	       - 192.168.1.103:7002
+	       - 192.168.1.103:7003
+	       - 192.168.1.103:7004
+	       - 192.168.1.103:7005
+	    maxIdle: 300
+	    maxTotal: 600
+	    maxWaitMillis: 1000
+	    testOnBorrow: true
+	    jedis: 
+	      pool:
+	        maxActive: 5000 #最大连接数
+	        maxIdle: 30 #最大空闲连接数
+	        minIdle: 5 #最小空闲连接数
+	        maxWait: 3000  #获取连接最大等待时间 ms  #default -1
 
 3，@PullCache 查询，如缓存中存在，则从缓存取，例如：
     @PullCache(value = "Student", key="id", expires=10)
