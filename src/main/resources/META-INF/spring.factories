@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.viching.redis.JedisClusterAutoConfiguration
+com.viching.redis.VichingJedisAutoConfiguration

@@ -1,6 +1,6 @@
 # spring-boot-starter-redis
 
-这个项目，建立在redis-cluster基础之上，实现功能如下：
+本项目兼容redis-cluster和redis-single，实现功能如下：
 
 通过注解的方式存储，查看，和删除实体，实际意义上实现redis集群效果。
 
@@ -11,7 +11,7 @@
     <dependency>
 		<groupId>com.viching.redis</groupId>
 		<artifactId>spring-boot-starter-redis</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.0.2</version>
 	</dependency>
 
 2，redis-cluster，环境配置和使用请参照官方文档,相关参数可配置如下，例如：
@@ -20,8 +20,9 @@
 	  redis:
 	    #host: 
 	    #port: 6379
+	    timeout: 1000
 	    password: admin
-	    cluster: 
+	    cluster:   // 若不配置表示为单机redis,否则忽略单机配置
 	      maxRedirects: 10
 	      nodes: 
 	       - 192.168.1.103:7000

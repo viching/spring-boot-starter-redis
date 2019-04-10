@@ -3,10 +3,9 @@ package com.viching.redis;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Unit test for simple App.
- */
+@SpringBootApplication
 public class AppTest 
 {
     /**
