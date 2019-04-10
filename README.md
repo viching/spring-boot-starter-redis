@@ -22,7 +22,7 @@
 	    #port: 6379
 	    timeout: 1000
 	    password: admin
-	    cluster:   // 若不配置表示为单机redis,否则忽略单机配置
+	    cluster:   #若不配置表示为单机redis,否则忽略单机配置
 	      maxRedirects: 10
 	      nodes: 
 	       - 192.168.1.103:7000
