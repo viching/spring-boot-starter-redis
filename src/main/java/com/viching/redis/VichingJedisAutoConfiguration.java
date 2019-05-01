@@ -1,5 +1,6 @@
 package com.viching.redis;
 
+import com.viching.redis.client.JedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,7 +36,7 @@ import java.time.Duration;
 @Configuration
 @ConditionalOnClass({RedisTemplate.class})
 @EnableConfigurationProperties(VichingRedisConfig.class)
-@Import({PullCacheAspect.class, PushCacheAspect.class, RemoveCacheAspect.class})
+@Import({PullCacheAspect.class, PushCacheAspect.class, RemoveCacheAspect.class, JedisClient.class})
 public class VichingJedisAutoConfiguration {
 
     //自动注入redis配置属性文件

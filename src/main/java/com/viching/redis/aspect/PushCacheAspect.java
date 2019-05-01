@@ -29,6 +29,8 @@ public class PushCacheAspect {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    private ExecutorService pool = Executors.newCachedThreadPool();
+
     @Pointcut("@annotation(com.viching.redis.annotation.PushCache)")
     private void pointcut() {
     }
@@ -67,75 +69,35 @@ public class PushCacheAspect {
         }
 
         if (!annotation.after()) {
-            saveRedis(annotation.transaction(), annotation.value(), field, targetObj, annotation.expires());
+            saveRedis(annotation.value(), field, targetObj, annotation.expires());
         }
 
         //执行方法本身
         result = joinPoint.proceed();
 
         if (annotation.after()) {
-            saveRedis(annotation.transaction(), annotation.value(), field, targetObj, annotation.expires());
+            saveRedis(annotation.value(), field, targetObj, annotation.expires());
         }
         return result;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void saveRedis(final boolean needTransaction, final String key1, final Object key2, final Object value, final long expires) throws Exception {
+    private void saveRedis(final String key1, final Object key2, final Object value, final long expires) throws Exception {
         //保存至redis
-        if (needTransaction) {
-            ExecutorService pool = Executors.newCachedThreadPool();
-            Future<Object> future = null;
-            while (future == null || future.get() == null) {
-                future = pool.submit(new Callable() {
-                    @Override
-                    public Object call() throws Exception {
-                        return redisTemplate.execute(new SessionCallback() {
-                            @Override
-                            public Object execute(RedisOperations operations) throws DataAccessException {
-                                operations.watch(key2);
-                                Object origin = null;
-                                if (key1.equals("")) {
-                                    origin = operations.opsForValue().get(key2);
-                                } else {
-                                    origin = operations.opsForHash().get(key1, key2);
-                                }
-                                Object target = value;
-                                if (origin != null) {
-                                    target = ReflectTools.combineFieldsCore(origin, value);
-                                }
-                                //开启事务
-                                operations.multi();
-                                if (key1.equals("")) {
-                                    operations.opsForValue().set(key2, target);
-                                } else {
-                                    operations.opsForHash().put(key1, key2, target);
-                                }
-                                //提交事务
-                                Object rs = operations.exec();
-                                return rs;
-                            }
-                        });
-                    }
-                });
-            }
-            pool.shutdown();
-            pool.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        Object origin = null;
+        if (key1.equals("")) {
+            origin = redisTemplate.opsForValue().get(key2);
         } else {
-            Object origin = null;
-            if (key1.equals("")) {
-                origin = redisTemplate.opsForValue().get(key2);
-            } else {
-                origin = redisTemplate.opsForHash().get(key1, key2);
-            }
-            Object target = value;
-            if (origin != null) {
-                target = ReflectTools.combineFieldsCore(origin, value);
-            }
-            if (key1.equals("")) {
-                redisTemplate.opsForValue().set(key2.toString(), target);
-            } else {
-                redisTemplate.opsForHash().put(key1, key2, target);
-            }
+            origin = redisTemplate.opsForHash().get(key1, key2);
+        }
+        Object target = value;
+        if (origin != null) {
+            target = ReflectTools.combineFieldsCore(origin, value);
+        }
+        if (key1.equals("")) {
+            redisTemplate.opsForValue().set(key2.toString(), target);
+        } else {
+            redisTemplate.opsForHash().put(key1, key2, target);
         }
         if (expires > 0) {
             if (key1.equals("")) {

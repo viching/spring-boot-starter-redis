@@ -18,6 +18,4 @@ public @interface PushCache {
     long expires() default 0l; //失效时间
     
     boolean after() default false; //在数据库之前操作还是之后，默认在数据库操作之前
-    
-    boolean transaction() default false; //是否开启redis事务，乐观锁
 }
